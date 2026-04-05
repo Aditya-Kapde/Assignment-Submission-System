@@ -71,7 +71,7 @@ assignment-devops/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Aditya-Kapde/Assignment-Submission-System.git
 cd assignment-devops
 ```
 
