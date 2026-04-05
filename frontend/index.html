@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assignment Submission System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; }
+    header { background: #2c3e50; color: white; padding: 16px 24px; font-size: 20px; font-weight: bold; }
+    .container { max-width: 860px; margin: 30px auto; padding: 0 16px; }
+    h2 { margin-bottom: 12px; color: #2c3e50; }
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; padding: 9px 12px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+    button { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1a252f; }
+    .assignment-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; margin-bottom: 12px; background: #fafafa; }
+    .assignment-item h3 { margin-bottom: 4px; }
+    .assignment-item p { font-size: 13px; color: #555; margin-bottom: 6px; }
+    .tag { font-size: 12px; color: #888; }
+    .sub-form { margin-top: 10px; display: none; }
+    .sub-form.open { display: block; }
+    .toggle-btn { background: #27ae60; margin-right: 8px; }
+    .toggle-btn:hover { background: #1e8449; }
+    .view-btn { background: #2980b9; }
+    .view-btn:hover { background: #1a6090; }
+    .submissions-box { margin-top: 10px; background: #eef6ff; border-radius: 5px; padding: 10px; font-size: 13px; }
+    .submissions-box p { margin-bottom: 4px; border-bottom: 1px solid #cce0f5; padding-bottom: 4px; }
+    #msg { color: green; font-size: 13px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+<header>📚 Student Assignment Submission System</header>
+<div class="container">
+
+  <!-- Create Assignment -->
+  <div class="card">
+    <h2>➕ Create Assignment</h2>
+    <input type="text" id="title" placeholder="Title" />
+    <textarea id="description" rows="3" placeholder="Description"></textarea>
+    <input type="datetime-local" id="deadline" />
+    <button onclick="createAssignment()">Create Assignment</button>
+    <p id="msg"></p>
+  </div>
+
+  <!-- View Assignments -->
+  <div class="card">
+    <h2>📋 All Assignments</h2>
+    <button onclick="loadAssignments()" style="margin-bottom:14px">🔄 Refresh</button>
+    <div id="assignments-list">Click Refresh to load.</div>
+  </div>
+
+</div>
+
+<script>
+  const API = "http://localhost:5000";
+
+  async function createAssignment() {
+    const title = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const deadline = document.getElementById("deadline").value;
+    if (!title || !description || !deadline) return alert("Fill all fields.");
+    const res = await fetch(`${API}/assignments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, deadline })
+    });
+    if (res.ok) {
+      document.getElementById("msg").textContent = "✅ Assignment created!";
+      document.getElementById("title").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("deadline").value = "";
+      loadAssignments();
+    }
+  }
+
+  async function loadAssignments() {
+    const res = await fetch(`${API}/assignments`);
+    const data = await res.json();
+    const container = document.getElementById("assignments-list");
+    if (!data.length) { container.innerHTML = "<p>No assignments yet.</p>"; return; }
+    container.innerHTML = data.map(a => `
+      <div class="assignment-item">
+        <h3>${a.title}</h3>
+        <p>${a.description}</p>
+        <span class="tag">⏰ Deadline: ${new Date(a.deadline).toLocaleString()}</span>
+        <br/><br/>
+        <button class="toggle-btn" onclick="toggleForm(${a.id})">✏️ Submit Answer</button>
+        <button class="view-btn" onclick="viewSubmissions(${a.id})">👁 View Submissions</button>
+        <div class="sub-form" id="form-${a.id}">
+          <input type="text" id="sname-${a.id}" placeholder="Your name" />
+          <textarea id="sanswer-${a.id}" rows="2" placeholder="Your answer"></textarea>
+          <button onclick="submitAssignment(${a.id})">Submit</button>
+        </div>
+        <div class="submissions-box" id="subs-${a.id}" style="display:none"></div>
+      </div>
+    `).join("");
+  }
+
+  function toggleForm(id) {
+    const f = document.getElementById(`form-${id}`);
+    f.classList.toggle("open");
+  }
+
+  async function submitAssignment(id) {
+    const student_name = document.getElementById(`sname-${id}`).value.trim();
+    const answer = document.getElementById(`sanswer-${id}`).value.trim();
+    if (!student_name || !answer) return alert("Fill name and answer.");
+    const res = await fetch(`${API}/assignments/${id}/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_name, answer })
+    });
+    if (res.ok) {
+      alert("✅ Submitted!");
+      toggleForm(id);
+    }
+  }
+
+  async function viewSubmissions(id) {
+    const box = document.getElementById(`subs-${id}`);
+    const res = await fetch(`${API}/assignments/${id}/submissions`);
+    const data = await res.json();
+    box.style.display = "block";
+    if (!data.length) { box.innerHTML = "<p>No submissions yet.</p>"; return; }
+    box.innerHTML = data.map(s =>
+      `<p><strong>${s.student_name}</strong>: ${s.answer} <em>(${new Date(s.submitted_at).toLocaleString()})</em></p>`
+    ).join("");
+  }
+</script>
+</body>
+</html>
