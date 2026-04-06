@@ -22,8 +22,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo '>>> Building Backend Docker Image...'
-                sh "docker build -t ${BACKEND_IMAGE} ${WORKSPACE_DIR}/backend"
-
+                sh 'docker build -t assignment-backend ${WORKSPACE}/backend'
                 echo '>>> Building Frontend Docker Image...'
                 sh "docker build -t ${FRONTEND_IMAGE} ${WORKSPACE_DIR}/frontend"
             }
