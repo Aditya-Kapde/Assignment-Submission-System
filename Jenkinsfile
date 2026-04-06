@@ -24,8 +24,7 @@ pipeline {
                 echo '>>> Building Backend Docker Image...'
                 sh 'docker build -t assignment-backend ${WORKSPACE}/backend'
                 echo '>>> Building Frontend Docker Image...'
-                sh "docker build -t ${FRONTEND_IMAGE} ${WORKSPACE_DIR}/frontend"
-            }
+                sh 'docker build -t assignment-frontend ${WORKSPACE}/frontend'            }
         }
 
         stage('Run Containers') {
