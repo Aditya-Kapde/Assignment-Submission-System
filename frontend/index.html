@@ -6,26 +6,52 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; }
-    header { background: #2c3e50; color: white; padding: 16px 24px; font-size: 20px; font-weight: bold; }
-    .container { max-width: 860px; margin: 30px auto; padding: 0 16px; }
+    header { background: #2c3e50; color: white; padding: 16px 24px; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+    .container { max-width: 900px; margin: 30px auto; padding: 0 16px; }
     h2 { margin-bottom: 12px; color: #2c3e50; }
     .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     input, textarea { width: 100%; padding: 9px 12px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-    button { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; }
-    button:hover { background: #1a252f; }
-    .assignment-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; margin-bottom: 12px; background: #fafafa; }
-    .assignment-item h3 { margin-bottom: 4px; }
-    .assignment-item p { font-size: 13px; color: #555; margin-bottom: 6px; }
+    input:focus, textarea:focus { outline: none; border-color: #2c3e50; }
+    button { color: white; border: none; padding: 9px 18px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s; }
+    .btn-primary { background: #2c3e50; }
+    .btn-primary:hover { background: #1a252f; }
+    .btn-green { background: #27ae60; }
+    .btn-green:hover { background: #1e8449; }
+    .btn-blue { background: #2980b9; }
+    .btn-blue:hover { background: #1a6090; }
+    .btn-orange { background: #e67e22; }
+    .btn-orange:hover { background: #ca6f1e; }
+    .btn-red { background: #e74c3c; }
+    .btn-red:hover { background: #c0392b; }
+    .btn-gray { background: #7f8c8d; }
+    .btn-gray:hover { background: #636e72; }
+
+    .assignment-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 14px; background: #fafafa; transition: box-shadow 0.2s; }
+    .assignment-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .assignment-item h3 { margin-bottom: 4px; font-size: 16px; color: #2c3e50; }
+    .assignment-item p { font-size: 13px; color: #555; margin-bottom: 8px; }
     .tag { font-size: 12px; color: #888; }
-    .sub-form { margin-top: 10px; display: none; }
+    .stats-badge { background: #eaf4ff; color: #2980b9; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .sub-form { margin-top: 12px; display: none; background: #f0f9f4; border-radius: 6px; padding: 12px; }
     .sub-form.open { display: block; }
-    .toggle-btn { background: #27ae60; margin-right: 8px; }
-    .toggle-btn:hover { background: #1e8449; }
-    .view-btn { background: #2980b9; }
-    .view-btn:hover { background: #1a6090; }
-    .submissions-box { margin-top: 10px; background: #eef6ff; border-radius: 5px; padding: 10px; font-size: 13px; }
-    .submissions-box p { margin-bottom: 4px; border-bottom: 1px solid #cce0f5; padding-bottom: 4px; }
-    #msg { color: green; font-size: 13px; margin-top: 6px; }
+    .edit-form { margin-top: 12px; display: none; background: #fff8e1; border-radius: 6px; padding: 12px; }
+    .edit-form.open { display: block; }
+    .detail-box { margin-top: 12px; background: #eef6ff; border-radius: 6px; padding: 12px; font-size: 13px; display: none; }
+    .detail-box.open { display: block; }
+    .submissions-box { margin-top: 10px; background: #eef6ff; border-radius: 5px; padding: 10px; font-size: 13px; display: none; }
+    .submissions-box.open { display: block; }
+    .sub-entry { padding: 6px 0; border-bottom: 1px solid #cce0f5; }
+    .sub-entry:last-child { border-bottom: none; }
+    .no-items { color: #999; font-size: 13px; font-style: italic; }
+
+    #msg { color: green; font-size: 13px; margin-top: 8px; min-height: 18px; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 10px; padding: 24px; max-width: 480px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    .modal h3 { margin-bottom: 12px; color: #2c3e50; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -38,27 +64,40 @@
     <input type="text" id="title" placeholder="Title" />
     <textarea id="description" rows="3" placeholder="Description"></textarea>
     <input type="datetime-local" id="deadline" />
-    <button onclick="createAssignment()">Create Assignment</button>
+    <button class="btn-primary" onclick="createAssignment()">Create Assignment</button>
     <p id="msg"></p>
   </div>
 
-  <!-- View Assignments -->
+  <!-- All Assignments -->
   <div class="card">
     <h2>📋 All Assignments</h2>
-    <button onclick="loadAssignments()" style="margin-bottom:14px">🔄 Refresh</button>
-    <div id="assignments-list">Click Refresh to load.</div>
+    <button class="btn-primary" onclick="loadAssignments()" style="margin-bottom:14px">🔄 Refresh</button>
+    <div id="assignments-list"><p class="no-items">Click Refresh to load.</p></div>
   </div>
 
 </div>
 
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>⚠️ Confirm Delete</h3>
+    <p>Are you sure you want to delete this assignment? All submissions will also be removed.</p>
+    <div class="modal-btns">
+      <button class="btn-red" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="btn-gray" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const API = "http://localhost:5000";
+  let deleteTargetId = null;
 
   async function createAssignment() {
     const title = document.getElementById("title").value.trim();
     const description = document.getElementById("description").value.trim();
     const deadline = document.getElementById("deadline").value;
-    if (!title || !description || !deadline) return alert("Fill all fields.");
+    if (!title || !description || !deadline) return alert("Please fill in all fields.");
     const res = await fetch(`${API}/assignments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -69,6 +108,7 @@
       document.getElementById("title").value = "";
       document.getElementById("description").value = "";
       document.getElementById("deadline").value = "";
+      setTimeout(() => document.getElementById("msg").textContent = "", 3000);
       loadAssignments();
     }
   }
@@ -77,55 +117,147 @@
     const res = await fetch(`${API}/assignments`);
     const data = await res.json();
     const container = document.getElementById("assignments-list");
-    if (!data.length) { container.innerHTML = "<p>No assignments yet.</p>"; return; }
-    container.innerHTML = data.map(a => `
-      <div class="assignment-item">
-        <h3>${a.title}</h3>
+    if (!data.length) { container.innerHTML = '<p class="no-items">No assignments yet. Create one above!</p>'; return; }
+    // Fetch stats for each
+    const statsAll = await Promise.all(data.map(a => fetch(`${API}/assignments/${a.id}/stats`).then(r => r.json())));
+    container.innerHTML = data.map((a, i) => {
+      const count = statsAll[i].submission_count || 0;
+      return `
+      <div class="assignment-item" id="item-${a.id}">
+        <h3>${a.title} <span class="stats-badge">📝 ${count} submission${count !== 1 ? 's' : ''}</span></h3>
         <p>${a.description}</p>
         <span class="tag">⏰ Deadline: ${new Date(a.deadline).toLocaleString()}</span>
-        <br/><br/>
-        <button class="toggle-btn" onclick="toggleForm(${a.id})">✏️ Submit Answer</button>
-        <button class="view-btn" onclick="viewSubmissions(${a.id})">👁 View Submissions</button>
+        <div class="btn-row">
+          <button class="btn-blue" onclick="toggleDetail(${a.id})">🔍 View Details</button>
+          <button class="btn-green" onclick="toggleSubmitForm(${a.id})">✏️ Submit Answer</button>
+          <button class="btn-blue" onclick="viewSubmissions(${a.id})">👁 Submissions</button>
+          <button class="btn-orange" onclick="toggleEditForm(${a.id}, '${escapeAttr(a.title)}', '${escapeAttr(a.description)}', '${a.deadline}')">✏️ Edit</button>
+          <button class="btn-red" onclick="openDeleteModal(${a.id})">🗑 Delete</button>
+        </div>
+
+        <!-- View Detail Box -->
+        <div class="detail-box" id="detail-${a.id}">
+          <strong>Assignment Details</strong>
+          <p style="margin-top:8px"><strong>Title:</strong> ${a.title}</p>
+          <p><strong>Description:</strong> ${a.description}</p>
+          <p><strong>Deadline:</strong> ${new Date(a.deadline).toLocaleString()}</p>
+          <p><strong>Created:</strong> ${new Date(a.created_at).toLocaleString()}</p>
+          <p><strong>Submissions:</strong> ${count}</p>
+        </div>
+
+        <!-- Submit Form -->
         <div class="sub-form" id="form-${a.id}">
           <input type="text" id="sname-${a.id}" placeholder="Your name" />
           <textarea id="sanswer-${a.id}" rows="2" placeholder="Your answer"></textarea>
-          <button onclick="submitAssignment(${a.id})">Submit</button>
+          <button class="btn-green" onclick="submitAssignment(${a.id})">Submit</button>
+          <button class="btn-gray" style="margin-left:8px" onclick="toggleSubmitForm(${a.id})">Cancel</button>
         </div>
-        <div class="submissions-box" id="subs-${a.id}" style="display:none"></div>
+
+        <!-- Edit Form -->
+        <div class="edit-form" id="edit-${a.id}">
+          <input type="text" id="etitle-${a.id}" placeholder="Title" />
+          <textarea id="edesc-${a.id}" rows="2" placeholder="Description"></textarea>
+          <input type="datetime-local" id="edeadline-${a.id}" />
+          <button class="btn-orange" onclick="updateAssignment(${a.id})">💾 Save Changes</button>
+          <button class="btn-gray" style="margin-left:8px" onclick="toggleEditForm(${a.id})">Cancel</button>
+        </div>
+
+        <!-- Submissions Box -->
+        <div class="submissions-box" id="subs-${a.id}"></div>
       </div>
-    `).join("");
+    `}).join("");
   }
 
-  function toggleForm(id) {
-    const f = document.getElementById(`form-${id}`);
-    f.classList.toggle("open");
+  function escapeAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  function toggleDetail(id) {
+    const box = document.getElementById(`detail-${id}`);
+    box.classList.toggle("open");
+  }
+
+  function toggleSubmitForm(id) {
+    document.getElementById(`form-${id}`).classList.toggle("open");
+  }
+
+  function toggleEditForm(id, title = "", desc = "", deadline = "") {
+    const form = document.getElementById(`edit-${id}`);
+    if (!form.classList.contains("open")) {
+      document.getElementById(`etitle-${id}`).value = title;
+      document.getElementById(`edesc-${id}`).value = desc;
+      document.getElementById(`edeadline-${id}`).value = deadline;
+    }
+    form.classList.toggle("open");
   }
 
   async function submitAssignment(id) {
     const student_name = document.getElementById(`sname-${id}`).value.trim();
     const answer = document.getElementById(`sanswer-${id}`).value.trim();
-    if (!student_name || !answer) return alert("Fill name and answer.");
+    if (!student_name || !answer) return alert("Please fill in your name and answer.");
     const res = await fetch(`${API}/assignments/${id}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_name, answer })
     });
     if (res.ok) {
-      alert("✅ Submitted!");
-      toggleForm(id);
+      alert("✅ Submitted successfully!");
+      toggleSubmitForm(id);
+      document.getElementById(`sname-${id}`).value = "";
+      document.getElementById(`sanswer-${id}`).value = "";
+      loadAssignments();
+    }
+  }
+
+  async function updateAssignment(id) {
+    const title = document.getElementById(`etitle-${id}`).value.trim();
+    const description = document.getElementById(`edesc-${id}`).value.trim();
+    const deadline = document.getElementById(`edeadline-${id}`).value;
+    if (!title || !description || !deadline) return alert("Please fill in all fields.");
+    const res = await fetch(`${API}/assignments/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, deadline })
+    });
+    if (res.ok) {
+      alert("✅ Assignment updated!");
+      loadAssignments();
+    }
+  }
+
+  function openDeleteModal(id) {
+    deleteTargetId = id;
+    document.getElementById("deleteModal").classList.add("open");
+  }
+
+  function closeModal() {
+    deleteTargetId = null;
+    document.getElementById("deleteModal").classList.remove("open");
+  }
+
+  async function confirmDelete() {
+    if (!deleteTargetId) return;
+    const res = await fetch(`${API}/assignments/${deleteTargetId}`, { method: "DELETE" });
+    if (res.ok) {
+      closeModal();
+      loadAssignments();
     }
   }
 
   async function viewSubmissions(id) {
     const box = document.getElementById(`subs-${id}`);
+    box.classList.toggle("open");
+    if (!box.classList.contains("open")) { box.innerHTML = ""; return; }
     const res = await fetch(`${API}/assignments/${id}/submissions`);
     const data = await res.json();
-    box.style.display = "block";
-    if (!data.length) { box.innerHTML = "<p>No submissions yet.</p>"; return; }
-    box.innerHTML = data.map(s =>
-      `<p><strong>${s.student_name}</strong>: ${s.answer} <em>(${new Date(s.submitted_at).toLocaleString()})</em></p>`
+    if (!data.length) { box.innerHTML = '<p class="no-items">No submissions yet.</p>'; return; }
+    box.innerHTML = "<strong>Submissions:</strong><br/>" + data.map(s =>
+      `<div class="sub-entry"><strong>${s.student_name}</strong>: ${s.answer} <em style="color:#999">(${new Date(s.submitted_at).toLocaleString()})</em></div>`
     ).join("");
   }
+
+  // Auto-load on page open
+  window.onload = loadAssignments;
 </script>
 </body>
 </html>

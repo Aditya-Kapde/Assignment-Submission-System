@@ -2,11 +2,7 @@ pipeline {
     agent any
 
     environment {
-        BACKEND_IMAGE  = "assignment-backend"
-        FRONTEND_IMAGE = "assignment-frontend"
-        BACKEND_PORT   = "5000"
-        FRONTEND_PORT  = "8080"
-        WORKSPACE_DIR  = "/workspace"
+        WORKSPACE_DIR = "${WORKSPACE}"
     }
 
     stages {
@@ -19,37 +15,35 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Compose Build') {
             steps {
-                echo '>>> Building Backend Docker Image...'
-                sh 'docker build -t assignment-backend ${WORKSPACE}/backend'
-                echo '>>> Building Frontend Docker Image...'
-                sh 'docker build -t assignment-frontend ${WORKSPACE}/frontend'            }
+                echo '>>> Building Docker images with docker-compose...'
+                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml build'
+                echo '>>> Build complete.'
+            }
         }
 
         stage('Run Containers') {
             steps {
-                echo '>>> Stopping old containers if any...'
-                sh "docker rm -f ${BACKEND_IMAGE} || true"
-                sh "docker rm -f ${FRONTEND_IMAGE} || true"
+                echo '>>> Stopping existing containers if running...'
+                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml down || true'
 
-                echo '>>> Starting Backend Container...'
-                sh "docker run -d --name ${BACKEND_IMAGE} -p ${BACKEND_PORT}:5000 ${BACKEND_IMAGE}"
+                echo '>>> Starting all containers with docker-compose...'
+                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml up -d'
 
-                echo '>>> Starting Frontend Container...'
-                sh "docker run -d --name ${FRONTEND_IMAGE} -p ${FRONTEND_PORT}:80 ${FRONTEND_IMAGE}"
-
-                echo '>>> Both containers are running!'
+                echo '>>> All containers are running!'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline completed. Backend: http://localhost:5000 | Frontend: http://localhost:8080'
+            echo '✅ Pipeline completed successfully!'
+            echo 'Backend API: http://localhost:5000'
+            echo 'Frontend UI: http://localhost:8080'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs above.'
+            echo '❌ Pipeline failed. Check the logs above for details.'
         }
     }
 }
