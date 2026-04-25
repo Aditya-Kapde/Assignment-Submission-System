@@ -40,7 +40,7 @@ pipeline {
         success {
             echo '✅ Pipeline completed successfully!'
             echo 'Backend API: http://localhost:5000'
-            echo 'Frontend UI: http://localhost:8080'
+            echo 'Frontend UI: http://localhost:8181'
         }
         failure {
             echo '❌ Pipeline failed. Check the logs above for details.'
