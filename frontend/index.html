@@ -2,262 +2,601 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assignment Submission System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AssignHub - Assignment Submission System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --success: #10b981;
+      --success-hover: #059669;
+      --warning: #f59e0b;
+      --warning-hover: #d97706;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --info: #0ea5e9;
+      --info-hover: #0284c7;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; }
-    header { background: #2c3e50; color: white; padding: 16px 24px; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-    .container { max-width: 900px; margin: 30px auto; padding: 0 16px; }
-    h2 { margin-bottom: 12px; color: #2c3e50; }
-    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; padding: 9px 12px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-    input:focus, textarea:focus { outline: none; border-color: #2c3e50; }
-    button { color: white; border: none; padding: 9px 18px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s; }
-    .btn-primary { background: #2c3e50; }
-    .btn-primary:hover { background: #1a252f; }
-    .btn-green { background: #27ae60; }
-    .btn-green:hover { background: #1e8449; }
-    .btn-blue { background: #2980b9; }
-    .btn-blue:hover { background: #1a6090; }
-    .btn-orange { background: #e67e22; }
-    .btn-orange:hover { background: #ca6f1e; }
-    .btn-red { background: #e74c3c; }
-    .btn-red:hover { background: #c0392b; }
-    .btn-gray { background: #7f8c8d; }
-    .btn-gray:hover { background: #636e72; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-main); }
+    
+    header { 
+      background: var(--card-bg); 
+      padding: 16px 40px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px solid var(--border-color);
+    }
+    .logo { font-size: 20px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .logo i { color: var(--primary); font-size: 24px; }
+    
+    .nav-links { display: flex; align-items: center; gap: 24px; font-size: 14px; font-weight: 500; }
+    .nav-links a { text-decoration: none; color: var(--text-muted); }
+    .nav-links a:hover { color: var(--text-main); }
+    .badge-semester { background: #eef2ff; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 
-    .assignment-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 14px; background: #fafafa; transition: box-shadow 0.2s; }
-    .assignment-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .assignment-item h3 { margin-bottom: 4px; font-size: 16px; color: #2c3e50; }
-    .assignment-item p { font-size: 13px; color: #555; margin-bottom: 8px; }
-    .tag { font-size: 12px; color: #888; }
-    .stats-badge { background: #eaf4ff; color: #2980b9; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+    .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .icon-box { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font-size: 24px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+    .stat-label { font-size: 13px; color: var(--text-muted); }
 
-    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .sub-form { margin-top: 12px; display: none; background: #f0f9f4; border-radius: 6px; padding: 12px; }
-    .sub-form.open { display: block; }
-    .edit-form { margin-top: 12px; display: none; background: #fff8e1; border-radius: 6px; padding: 12px; }
-    .edit-form.open { display: block; }
-    .detail-box { margin-top: 12px; background: #eef6ff; border-radius: 6px; padding: 12px; font-size: 13px; display: none; }
-    .detail-box.open { display: block; }
-    .submissions-box { margin-top: 10px; background: #eef6ff; border-radius: 5px; padding: 10px; font-size: 13px; display: none; }
-    .submissions-box.open { display: block; }
-    .sub-entry { padding: 6px 0; border-bottom: 1px solid #cce0f5; }
-    .sub-entry:last-child { border-bottom: none; }
-    .no-items { color: #999; font-size: 13px; font-style: italic; }
+    /* Create Card */
+    .card { background: var(--card-bg); border-radius: 16px; padding: 32px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .icon-circle { background: #eef2ff; color: var(--primary); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .card h2 { font-size: 20px; font-weight: 600; }
+    .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; padding-left: 44px; }
 
-    #msg { color: green; font-size: 13px; margin-top: 8px; min-height: 18px; }
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--text-main); }
+    .required { color: var(--danger); }
+    .char-count { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+    
+    input, textarea, select { 
+      width: 100%; 
+      padding: 12px 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      font-size: 14px; 
+      font-family: inherit;
+      background: #fcfcfd;
+      transition: all 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    textarea { resize: vertical; min-height: 100px; }
+    
+    .action-row { display: flex; justify-content: flex-end; margin-top: 24px; }
+    
+    button { 
+      font-family: inherit; 
+      border: none; 
+      padding: 10px 18px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 14px; 
+      font-weight: 600; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 8px; 
+      transition: all 0.2s; 
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: var(--success-hover); }
+    .btn-info { background: var(--info); color: white; }
+    .btn-info:hover { background: var(--info-hover); }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover { background: var(--warning-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-text { background: transparent; color: var(--primary); padding: 8px; }
+    .btn-text:hover { background: #eef2ff; }
+
+    /* Assignments Section */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
+    .count-badge { background: #eef2ff; color: var(--primary); font-size: 14px; padding: 2px 10px; border-radius: 20px; }
+
+    .filter-bar { display: flex; gap: 16px; margin-bottom: 24px; }
+    .search-box { flex: 1; position: relative; }
+    .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-box input { padding-left: 40px; background: white; }
+    .filters { display: flex; gap: 12px; }
+    .filters select { width: 160px; background: white; cursor: pointer; }
+
+    /* Grid */
+    .assignments-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    
+    .assignment-card { 
+      background: var(--card-bg); 
+      border-radius: 12px; 
+      padding: 24px; 
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--success);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .assignment-card.overdue { border-left-color: var(--danger); }
+    
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .card-top h3 { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--text-main); flex: 1; margin-right: 12px; }
+    .status-badge { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .status-badge.overdue { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+    
+    .assignment-card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; font-weight: 500; }
+    .card-meta .deadline { display: flex; align-items: center; gap: 6px; }
+    .card-meta .submissions { display: flex; align-items: center; gap: 6px; color: var(--primary); background: #eef2ff; padding: 4px 10px; border-radius: 6px; }
+    
+    .card-actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+    .card-actions button { font-size: 13px; padding: 8px 12px; border-radius: 6px; }
+
+    /* Forms inline */
+    .inline-form { display: none; background: #f8fafc; border-radius: 8px; padding: 16px; margin-top: 16px; border: 1px solid var(--border-color); }
+    .inline-form.open { display: block; }
+    .inline-form h4 { margin-bottom: 12px; font-size: 14px; }
+    
+    .submissions-list { display: none; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+    .submissions-list.open { display: block; }
+    .sub-entry { padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+    .sub-entry strong { color: var(--text-main); display: block; margin-bottom: 4px; }
+    .sub-entry .date { font-size: 12px; color: var(--text-muted); display: block; margin-top: 6px; }
+
+    #msg { color: var(--success); font-size: 14px; margin-top: 12px; font-weight: 500; }
+    .no-items { color: var(--text-muted); font-size: 14px; text-align: center; padding: 40px; grid-column: 1 / -1; background: white; border-radius: 12px; border: 1px dashed var(--border-color); }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .modal-overlay.open { display: flex; }
-    .modal { background: white; border-radius: 10px; padding: 24px; max-width: 480px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
-    .modal h3 { margin-bottom: 12px; color: #2c3e50; }
-    .modal-btns { display: flex; gap: 10px; margin-top: 10px; }
+    .modal { background: white; border-radius: 16px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); text-align: center; }
+    .modal-icon { width: 48px; height: 48px; background: #fef2f2; color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+    .modal h3 { margin-bottom: 8px; color: var(--text-main); font-size: 18px; }
+    .modal p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+    .modal-btns { display: flex; gap: 12px; }
+    .modal-btns button { flex: 1; justify-content: center; }
+    .btn-outline { background: white; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg-color); }
   </style>
 </head>
 <body>
-<header>📚 Student Assignment Submission System</header>
-<div class="container">
 
-  <!-- Create Assignment -->
-  <div class="card">
-    <h2>➕ Create Assignment</h2>
-    <input type="text" id="title" placeholder="Title" />
-    <textarea id="description" rows="3" placeholder="Description"></textarea>
-    <input type="datetime-local" id="deadline" />
-    <button class="btn-primary" onclick="createAssignment()">Create Assignment</button>
-    <p id="msg"></p>
+  <header>
+    <div class="logo"><i class="fa-solid fa-book-open"></i> <span>AssignHub</span></div>
+    <div class="nav-links">
+      <a href="#create-section">Create</a>
+      <a href="#assignments-section">Assignments</a>
+      <span class="badge-semester"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Spring 2026</span>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-box" style="background: #eef2ff; color: var(--primary);"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="stat-info">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total Assignments</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box" style="background: #ecfdf5; color: var(--success);"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+          <div class="stat-num" id="stat-open">0</div>
+          <div class="stat-label">Open</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box" style="background: #fef2f2; color: var(--danger);"><i class="fa-regular fa-bell"></i></div>
+        <div class="stat-info">
+          <div class="stat-num" id="stat-overdue">0</div>
+          <div class="stat-label">Overdue</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box" style="background: #f0f9ff; color: var(--info);"><i class="fa-solid fa-upload"></i></div>
+        <div class="stat-info">
+          <div class="stat-num" id="stat-submissions">0</div>
+          <div class="stat-label">Total Submissions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Assignment Form -->
+    <div class="card" id="create-section">
+      <div class="card-header">
+        <div class="icon-circle"><i class="fa-solid fa-plus"></i></div>
+        <h2>Create New Assignment</h2>
+      </div>
+      <p class="subtitle">Fill in the details below to publish a new assignment for students.</p>
+      
+      <div class="form-group">
+        <label>Assignment Title <span class="required">*</span></label>
+        <input type="text" id="title" placeholder="e.g. Introduction to React Hooks" />
+      </div>
+      
+      <div class="form-group">
+        <label style="display: flex; justify-content: space-between;">
+          <span>Description <span class="required">*</span></span>
+          <span class="char-count" id="char-count">0/500</span>
+        </label>
+        <textarea id="description" placeholder="Describe the assignment objectives, requirements, and submission guidelines..." maxlength="500"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Deadline <span class="required">*</span></label>
+        <input type="datetime-local" id="deadline" />
+      </div>
+
+      <div class="action-row">
+        <button class="btn-primary" onclick="createAssignment()"><i class="fa-solid fa-plus"></i> Create Assignment</button>
+      </div>
+      <p id="msg"></p>
+    </div>
+
+    <!-- All Assignments Header -->
+    <div class="section-header" id="assignments-section">
+      <div class="section-title">
+        All Assignments <span class="count-badge" id="total-count-badge">0</span>
+      </div>
+      <button class="btn-text" onclick="loadAssignments()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search assignments by title or description..." onkeyup="filterAssignments()" />
+      </div>
+      <div class="filters">
+        <select id="statusFilter" onchange="filterAssignments()">
+          <option value="all">All Status</option>
+          <option value="open">Open</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <select id="sortFilter" onchange="filterAssignments()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="deadline">Nearest Deadline</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="assignments-list" class="assignments-grid">
+      <!-- Generated Cards Go Here -->
+    </div>
+
   </div>
 
-  <!-- All Assignments -->
-  <div class="card">
-    <h2>📋 All Assignments</h2>
-    <button class="btn-primary" onclick="loadAssignments()" style="margin-bottom:14px">🔄 Refresh</button>
-    <div id="assignments-list"><p class="no-items">Click Refresh to load.</p></div>
-  </div>
-
-</div>
-
-<!-- Delete Confirm Modal -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <h3>⚠️ Confirm Delete</h3>
-    <p>Are you sure you want to delete this assignment? All submissions will also be removed.</p>
-    <div class="modal-btns">
-      <button class="btn-red" onclick="confirmDelete()">Yes, Delete</button>
-      <button class="btn-gray" onclick="closeModal()">Cancel</button>
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3>Confirm Delete</h3>
+      <p>Are you sure you want to delete this assignment? All associated submissions will be permanently removed.</p>
+      <div class="modal-btns">
+        <button class="btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn-danger" onclick="confirmDelete()">Delete</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  const API = "http://localhost:5000";
-  let deleteTargetId = null;
+  <script>
+    const API = "http://localhost:5000";
+    let deleteTargetId = null;
+    let allAssignmentsData = [];
+    let allStats = {};
 
-  async function createAssignment() {
-    const title = document.getElementById("title").value.trim();
-    const description = document.getElementById("description").value.trim();
-    const deadline = document.getElementById("deadline").value;
-    if (!title || !description || !deadline) return alert("Please fill in all fields.");
-    const res = await fetch(`${API}/assignments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, deadline })
+    document.getElementById('description').addEventListener('input', function() {
+      document.getElementById('char-count').innerText = `${this.value.length}/500`;
     });
-    if (res.ok) {
-      document.getElementById("msg").textContent = "✅ Assignment created!";
-      document.getElementById("title").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("deadline").value = "";
-      setTimeout(() => document.getElementById("msg").textContent = "", 3000);
-      loadAssignments();
-    }
-  }
 
-  async function loadAssignments() {
-    const res = await fetch(`${API}/assignments`);
-    const data = await res.json();
-    const container = document.getElementById("assignments-list");
-    if (!data.length) { container.innerHTML = '<p class="no-items">No assignments yet. Create one above!</p>'; return; }
-    // Fetch stats for each
-    const statsAll = await Promise.all(data.map(a => fetch(`${API}/assignments/${a.id}/stats`).then(r => r.json())));
-    container.innerHTML = data.map((a, i) => {
-      const count = statsAll[i].submission_count || 0;
-      return `
-      <div class="assignment-item" id="item-${a.id}">
-        <h3>${a.title} <span class="stats-badge">📝 ${count} submission${count !== 1 ? 's' : ''}</span></h3>
-        <p>${a.description}</p>
-        <span class="tag">⏰ Deadline: ${new Date(a.deadline).toLocaleString()}</span>
-        <div class="btn-row">
-          <button class="btn-blue" onclick="toggleDetail(${a.id})">🔍 View Details</button>
-          <button class="btn-green" onclick="toggleSubmitForm(${a.id})">✏️ Submit Answer</button>
-          <button class="btn-blue" onclick="viewSubmissions(${a.id})">👁 Submissions</button>
-          <button class="btn-orange" onclick="toggleEditForm(${a.id}, '${escapeAttr(a.title)}', '${escapeAttr(a.description)}', '${a.deadline}')">✏️ Edit</button>
-          <button class="btn-red" onclick="openDeleteModal(${a.id})">🗑 Delete</button>
+    async function createAssignment() {
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const deadline = document.getElementById("deadline").value;
+      if (!title || !description || !deadline) return alert("Please fill in all fields.");
+      
+      const res = await fetch(`${API}/assignments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description, deadline })
+      });
+      if (res.ok) {
+        document.getElementById("msg").innerHTML = '<i class="fa-solid fa-circle-check"></i> Assignment created successfully!';
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("deadline").value = "";
+        document.getElementById("char-count").innerText = "0/500";
+        setTimeout(() => document.getElementById("msg").innerHTML = "", 3000);
+        loadAssignments();
+      }
+    }
+
+    async function loadAssignments() {
+      try {
+        const res = await fetch(`${API}/assignments`);
+        allAssignmentsData = await res.json();
+        
+        let totalSubs = 0;
+        let openCount = 0;
+        let overdueCount = 0;
+        const now = new Date();
+
+        // Fetch stats for each
+        for (const a of allAssignmentsData) {
+          const subsRes = await fetch(`${API}/assignments/${a.id}/submissions`);
+          const subs = await subsRes.json();
+          allStats[a.id] = subs;
+          totalSubs += subs.length;
+
+          const isOverdue = new Date(a.deadline) < now;
+          if (isOverdue) overdueCount++;
+          else openCount++;
+        }
+
+        // Update top stats
+        document.getElementById('stat-total').innerText = allAssignmentsData.length;
+        document.getElementById('stat-open').innerText = openCount;
+        document.getElementById('stat-overdue').innerText = overdueCount;
+        document.getElementById('stat-submissions').innerText = totalSubs;
+        document.getElementById('total-count-badge').innerText = allAssignmentsData.length;
+
+        renderAssignments(allAssignmentsData);
+      } catch (err) {
+        document.getElementById("assignments-list").innerHTML = '<p class="no-items">Failed to connect to server. Ensure backend is running.</p>';
+      }
+    }
+
+    function filterAssignments() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+      const now = new Date();
+
+      let filtered = allAssignmentsData.filter(a => {
+        const matchesSearch = a.title.toLowerCase().includes(search) || a.description.toLowerCase().includes(search);
+        const isOverdue = new Date(a.deadline) < now;
+        const matchesStatus = status === 'all' || (status === 'open' && !isOverdue) || (status === 'overdue' && isOverdue);
+        return matchesSearch && matchesStatus;
+      });
+
+      if (sort === 'newest') filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      if (sort === 'oldest') filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      if (sort === 'deadline') filtered.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+      renderAssignments(filtered);
+    }
+
+    function renderAssignments(data) {
+      const container = document.getElementById("assignments-list");
+      if (!data.length) { 
+        container.innerHTML = '<div class="no-items"><i class="fa-solid fa-folder-open" style="font-size: 32px; color: #cbd5e1; margin-bottom: 12px;"></i><br/>No assignments found.</div>'; 
+        return; 
+      }
+      
+      const now = new Date();
+      
+      container.innerHTML = data.map(a => {
+        const subs = allStats[a.id] || [];
+        const count = subs.length;
+        const deadlineDate = new Date(a.deadline);
+        const isOverdue = deadlineDate < now;
+        const statusText = isOverdue ? "Overdue" : "Open";
+        const statusClass = isOverdue ? "overdue" : "";
+        const statusIcon = isOverdue ? "fa-clock" : "fa-circle-check";
+        
+        const formattedDeadline = deadlineDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+
+        return `
+        <div class="assignment-card ${statusClass}">
+          <div class="card-top">
+            <h3>${a.title}</h3>
+            <div class="status-badge ${statusClass}"><i class="fa-regular ${statusIcon}"></i> ${statusText}</div>
+          </div>
+          <p>${a.description}</p>
+          
+          <div class="card-meta">
+            <div class="deadline"><i class="fa-regular fa-clock"></i> ${formattedDeadline}</div>
+            <div class="submissions"><i class="fa-solid fa-file-arrow-up"></i> ${count} submission${count !== 1 ? 's' : ''}</div>
+          </div>
+          
+          <div class="card-actions">
+            <button class="btn-primary" onclick="viewDetails(${a.id})"><i class="fa-regular fa-eye"></i> View Details</button>
+            <button class="btn-success" onclick="toggleSubmitForm(${a.id})"><i class="fa-solid fa-upload"></i> Submit Answer</button>
+            <button class="btn-info" onclick="toggleSubmissions(${a.id})"><i class="fa-solid fa-list-ul"></i> Submissions</button>
+            <button class="btn-warning" onclick="toggleEditForm(${a.id}, '${escapeAttr(a.title)}', '${escapeAttr(a.description)}', '${a.deadline}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+            <button class="btn-danger" onclick="openDeleteModal(${a.id})"><i class="fa-regular fa-trash-can"></i> Delete</button>
+          </div>
+
+          <!-- Submit Form -->
+          <div class="inline-form" id="form-${a.id}">
+            <h4>Submit Answer</h4>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <input type="text" id="sname-${a.id}" placeholder="Student Name" />
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <textarea id="sanswer-${a.id}" rows="2" placeholder="Your Answer / File Link"></textarea>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-success" onclick="submitAssignment(${a.id})">Submit</button>
+              <button class="btn-outline" onclick="toggleSubmitForm(${a.id})">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Edit Form -->
+          <div class="inline-form" id="edit-${a.id}">
+            <h4>Edit Assignment</h4>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <input type="text" id="etitle-${a.id}" placeholder="Title" />
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <textarea id="edesc-${a.id}" rows="2" placeholder="Description"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <input type="datetime-local" id="edeadline-${a.id}" />
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-warning" onclick="updateAssignment(${a.id})">Save Changes</button>
+              <button class="btn-outline" onclick="toggleEditForm(${a.id})">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Submissions List -->
+          <div class="submissions-list" id="subs-${a.id}">
+            <h4>Submissions (${count})</h4>
+            <div style="margin-top: 12px;">
+              ${count === 0 ? '<div style="color: var(--text-muted); font-size: 13px;">No submissions yet.</div>' : 
+                subs.map(s => `
+                  <div class="sub-entry">
+                    <strong>${s.student_name}</strong>
+                    <div style="font-size: 13px; color: var(--text-main); margin-top:4px;">${s.answer}</div>
+                    <span class="date"><i class="fa-regular fa-clock"></i> ${new Date(s.submitted_at).toLocaleString()}</span>
+                  </div>
+                `).join("")
+              }
+            </div>
+          </div>
+
         </div>
-
-        <!-- View Detail Box -->
-        <div class="detail-box" id="detail-${a.id}">
-          <strong>Assignment Details</strong>
-          <p style="margin-top:8px"><strong>Title:</strong> ${a.title}</p>
-          <p><strong>Description:</strong> ${a.description}</p>
-          <p><strong>Deadline:</strong> ${new Date(a.deadline).toLocaleString()}</p>
-          <p><strong>Created:</strong> ${new Date(a.created_at).toLocaleString()}</p>
-          <p><strong>Submissions:</strong> ${count}</p>
-        </div>
-
-        <!-- Submit Form -->
-        <div class="sub-form" id="form-${a.id}">
-          <input type="text" id="sname-${a.id}" placeholder="Your name" />
-          <textarea id="sanswer-${a.id}" rows="2" placeholder="Your answer"></textarea>
-          <button class="btn-green" onclick="submitAssignment(${a.id})">Submit</button>
-          <button class="btn-gray" style="margin-left:8px" onclick="toggleSubmitForm(${a.id})">Cancel</button>
-        </div>
-
-        <!-- Edit Form -->
-        <div class="edit-form" id="edit-${a.id}">
-          <input type="text" id="etitle-${a.id}" placeholder="Title" />
-          <textarea id="edesc-${a.id}" rows="2" placeholder="Description"></textarea>
-          <input type="datetime-local" id="edeadline-${a.id}" />
-          <button class="btn-orange" onclick="updateAssignment(${a.id})">💾 Save Changes</button>
-          <button class="btn-gray" style="margin-left:8px" onclick="toggleEditForm(${a.id})">Cancel</button>
-        </div>
-
-        <!-- Submissions Box -->
-        <div class="submissions-box" id="subs-${a.id}"></div>
-      </div>
-    `}).join("");
-  }
-
-  function escapeAttr(str) {
-    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  }
-
-  function toggleDetail(id) {
-    const box = document.getElementById(`detail-${id}`);
-    box.classList.toggle("open");
-  }
-
-  function toggleSubmitForm(id) {
-    document.getElementById(`form-${id}`).classList.toggle("open");
-  }
-
-  function toggleEditForm(id, title = "", desc = "", deadline = "") {
-    const form = document.getElementById(`edit-${id}`);
-    if (!form.classList.contains("open")) {
-      document.getElementById(`etitle-${id}`).value = title;
-      document.getElementById(`edesc-${id}`).value = desc;
-      document.getElementById(`edeadline-${id}`).value = deadline;
+        `;
+      }).join("");
     }
-    form.classList.toggle("open");
-  }
 
-  async function submitAssignment(id) {
-    const student_name = document.getElementById(`sname-${id}`).value.trim();
-    const answer = document.getElementById(`sanswer-${id}`).value.trim();
-    if (!student_name || !answer) return alert("Please fill in your name and answer.");
-    const res = await fetch(`${API}/assignments/${id}/submit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ student_name, answer })
-    });
-    if (res.ok) {
-      alert("✅ Submitted successfully!");
-      toggleSubmitForm(id);
-      document.getElementById(`sname-${id}`).value = "";
-      document.getElementById(`sanswer-${id}`).value = "";
-      loadAssignments();
+    function escapeAttr(str) {
+      if (!str) return "";
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
-  }
 
-  async function updateAssignment(id) {
-    const title = document.getElementById(`etitle-${id}`).value.trim();
-    const description = document.getElementById(`edesc-${id}`).value.trim();
-    const deadline = document.getElementById(`edeadline-${id}`).value;
-    if (!title || !description || !deadline) return alert("Please fill in all fields.");
-    const res = await fetch(`${API}/assignments/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, deadline })
-    });
-    if (res.ok) {
-      alert("✅ Assignment updated!");
-      loadAssignments();
+    function viewDetails(id) {
+      const a = allAssignmentsData.find(x => x.id === id);
+      if(!a) return;
+      alert(`Assignment: ${a.title}\n\nDescription:\n${a.description}\n\nDeadline: ${new Date(a.deadline).toLocaleString()}`);
     }
-  }
 
-  function openDeleteModal(id) {
-    deleteTargetId = id;
-    document.getElementById("deleteModal").classList.add("open");
-  }
-
-  function closeModal() {
-    deleteTargetId = null;
-    document.getElementById("deleteModal").classList.remove("open");
-  }
-
-  async function confirmDelete() {
-    if (!deleteTargetId) return;
-    const res = await fetch(`${API}/assignments/${deleteTargetId}`, { method: "DELETE" });
-    if (res.ok) {
-      closeModal();
-      loadAssignments();
+    function toggleSubmitForm(id) {
+      closeAllInlines(id);
+      document.getElementById(`form-${id}`).classList.toggle("open");
     }
-  }
 
-  async function viewSubmissions(id) {
-    const box = document.getElementById(`subs-${id}`);
-    box.classList.toggle("open");
-    if (!box.classList.contains("open")) { box.innerHTML = ""; return; }
-    const res = await fetch(`${API}/assignments/${id}/submissions`);
-    const data = await res.json();
-    if (!data.length) { box.innerHTML = '<p class="no-items">No submissions yet.</p>'; return; }
-    box.innerHTML = "<strong>Submissions:</strong><br/>" + data.map(s =>
-      `<div class="sub-entry"><strong>${s.student_name}</strong>: ${s.answer} <em style="color:#999">(${new Date(s.submitted_at).toLocaleString()})</em></div>`
-    ).join("");
-  }
+    function toggleEditForm(id, title = "", desc = "", deadline = "") {
+      closeAllInlines(id);
+      const form = document.getElementById(`edit-${id}`);
+      if (!form.classList.contains("open")) {
+        document.getElementById(`etitle-${id}`).value = title;
+        document.getElementById(`edesc-${id}`).value = desc;
+        document.getElementById(`edeadline-${id}`).value = deadline;
+      }
+      form.classList.toggle("open");
+    }
 
-  // Auto-load on page open
-  window.onload = loadAssignments;
-</script>
+    function toggleSubmissions(id) {
+      closeAllInlines(id);
+      document.getElementById(`subs-${id}`).classList.toggle("open");
+    }
+    
+    function closeAllInlines(id) {
+      const card = document.querySelector(`.assignment-card:has(#form-${id})`);
+      if(card) {
+        card.querySelectorAll('.inline-form, .submissions-list').forEach(el => {
+          if(!el.id.endsWith(`-${id}`) || el.id === `subs-${id}` || el.id === `form-${id}` || el.id === `edit-${id}`) {
+             // Let the toggle function handle it, but close others
+          }
+        });
+      }
+      // Simplest way: close all inline forms except the one toggled
+      document.querySelectorAll('.inline-form, .submissions-list').forEach(el => {
+         if(!el.id.includes(`-${id}`)) el.classList.remove('open');
+      });
+    }
+
+    async function submitAssignment(id) {
+      const student_name = document.getElementById(`sname-${id}`).value.trim();
+      const answer = document.getElementById(`sanswer-${id}`).value.trim();
+      if (!student_name || !answer) return alert("Please fill in your name and answer.");
+      const res = await fetch(`${API}/assignments/${id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_name, answer })
+      });
+      if (res.ok) {
+        alert("Submitted successfully!");
+        loadAssignments();
+      }
+    }
+
+    async function updateAssignment(id) {
+      // NOTE: Original backend doesn't have a PUT endpoint in app.py.
+      // This will fail unless backend is updated. But matching original logic.
+      const title = document.getElementById(`etitle-${id}`).value.trim();
+      const description = document.getElementById(`edesc-${id}`).value.trim();
+      const deadline = document.getElementById(`edeadline-${id}`).value;
+      if (!title || !description || !deadline) return alert("Please fill in all fields.");
+      try {
+        const res = await fetch(`${API}/assignments/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, description, deadline })
+        });
+        if (res.ok) {
+          alert("Assignment updated!");
+          loadAssignments();
+        } else {
+          alert("Update feature not supported by current backend API.");
+        }
+      } catch (err) {
+        alert("Error updating assignment.");
+      }
+    }
+
+    function openDeleteModal(id) {
+      deleteTargetId = id;
+      document.getElementById("deleteModal").classList.add("open");
+    }
+
+    function closeModal() {
+      deleteTargetId = null;
+      document.getElementById("deleteModal").classList.remove("open");
+    }
+
+    async function confirmDelete() {
+      if (!deleteTargetId) return;
+      // NOTE: Original backend doesn't have a DELETE endpoint in app.py.
+      try {
+        const res = await fetch(`${API}/assignments/${deleteTargetId}`, { method: "DELETE" });
+        if (res.ok) {
+          closeModal();
+          loadAssignments();
+        } else {
+          alert("Delete feature not supported by current backend API.");
+          closeModal();
+        }
+      } catch(err) {
+        alert("Error deleting assignment.");
+        closeModal();
+      }
+    }
+
+    // Initialize
+    window.onload = loadAssignments;
+  </script>
 </body>
 </html>
