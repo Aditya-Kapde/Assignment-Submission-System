@@ -1,49 +1,43 @@
 pipeline {
     agent any
 
-    environment {
-        WORKSPACE_DIR = "${WORKSPACE}"
-    }
-
     stages {
 
         stage('Build (Maven - Demo)') {
             steps {
-                echo '>>> Simulating Maven build for demonstration purposes...'
-                echo 'mvn clean package -DskipTests'
-                echo '>>> Maven build stage complete.'
+                echo '>>> Simulating Maven build...'
+            }
+        }
+
+        stage('Docker Check') {
+            steps {
+                bat 'docker --version'
+                bat 'docker compose version'
             }
         }
 
         stage('Docker Compose Build') {
             steps {
-                echo '>>> Building Docker images with docker-compose...'
-                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml build'
-                echo '>>> Build complete.'
+                bat "docker compose -f \"%WORKSPACE%\\docker-compose.yml\" build"
             }
         }
 
         stage('Run Containers') {
             steps {
-                echo '>>> Stopping existing containers if running...'
-                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml down || true'
-
-                echo '>>> Starting all containers with docker-compose...'
-                sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml up -d'
-
-                echo '>>> All containers are running!'
+                bat "docker compose -f \"%WORKSPACE%\\docker-compose.yml\" down"
+                bat "docker compose -f \"%WORKSPACE%\\docker-compose.yml\" up -d"
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
-            echo 'Backend API: http://localhost:5000'
-            echo 'Frontend UI: http://localhost:8181'
+            echo '✅ SUCCESS'
+            echo 'Frontend: http://localhost:8181'
+            echo 'Backend: http://localhost:5000'
         }
         failure {
-            echo '❌ Pipeline failed. Check the logs above for details.'
+            echo '❌ FAILED'
         }
     }
 }
